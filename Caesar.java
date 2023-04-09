@@ -8,10 +8,10 @@ import static java.lang.Math.abs;
 public class Caesar {
     private static final ArrayList<Character> ALPHABET = new ArrayList<>( //"алфавит" шифра
             List.of(
-            'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н',
-            'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь',
-            'э', 'ю', 'я', '.', ',', '\"', ':', '-', '!', '?', ' ' // size = 41
-    ));
+                    'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н',
+                    'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь',
+                    'э', 'ю', 'я', '.', ',', '\"', ':', '-', '!', '?', ' ' // size = 41
+            ));
 
     private static Scanner scanner = new Scanner(System.in);
 
@@ -48,12 +48,9 @@ public class Caesar {
             while (!scanner.hasNext()) { //если в сканер ввели неподходящий формат
                 System.out.println("You entered the wrong path. Try again.");
             }
-
             path = scanner.nextLine();
-
             if (Files.notExists(Path.of(path)) || !Path.of(path).isAbsolute()) //проверка пути на существование файла и что путь является абсолютным
                 System.out.println("Wrong path of file. Try again");
-
         } while (Files.notExists(Path.of(path)) || !Path.of(path).isAbsolute() || path.equals(""));
         return path;
     }
@@ -65,8 +62,7 @@ public class Caesar {
 
     private static void encryptionDecryption(int idMethod, String filePath) { //работа с файлами
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath(filePath))))
-        {
+             BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath(filePath)))) {
             switch (idMethod) {
                 case 1 -> { //режим при известном сдвиге
                     int shift = shiftValue(scanner);
@@ -77,27 +73,15 @@ public class Caesar {
                         writer.write(encryptedChar);
                     }
                 }
-
                 case 2 -> { //режим при неизвестном сдвиге
-                    char[] firstLine = null;
-                    if (reader.ready()) {
-                        do {
-                            firstLine = reader.readLine().toCharArray(); //Получаем первую строку в виде массива символов
-                        } while (firstLine.length < 1);
-                    }
-                    int shift = cryptValue(firstLine); //метод для определения сдвига
-
-                    int i = 0;
-                    while (i < firstLine.length) {  //цикл для расшифровки первой строки
-                        char encryptedChar = encrypt(firstLine[i], shift);
-                        writer.write(encryptedChar);
-                        i++;
-                    }
-
+                    ArrayList<Character> charList = new ArrayList<>();
                     int character;
-                    while ((character = reader.read()) != -1) { //цикл для расшифровки остального файла
-                        char originalChar = (char) character;
-                        char encryptedChar = encrypt(originalChar, shift);
+                    while (((character = reader.read()) != -1)) {
+                        charList.add((char) character);
+                    }
+                    int shift = cryptValue(charList);
+                    for (char characterList : charList) {
+                        char encryptedChar = encrypt(characterList, shift);
                         writer.write(encryptedChar);
                     }
                 }
@@ -106,6 +90,7 @@ public class Caesar {
             System.out.println("Oh.. Smth went wrong :(" + e);
         }
     }
+
 
     private static int shiftValue(Scanner scanner) { //Установка значения смещения и его проверка
         int shift; //объявление переменной сдвига
@@ -126,7 +111,7 @@ public class Caesar {
     }
 
     private static char encrypt(char orig, int shift) {
-        char encrypted = Character.toLowerCase(orig);   // Привидение буквы к нижниму регистру
+        char encrypted = Character.toLowerCase(orig);   // Привидение буквы к нижнему регистру
         if (!ALPHABET.contains(encrypted))  // Если символа нет в алфавите, то его не нужно шифровать
             return orig;
         int index = (ALPHABET.indexOf(encrypted) + shift) % ALPHABET.size();    // индекс расшифрованной буквы
@@ -136,19 +121,19 @@ public class Caesar {
         return Character.isUpperCase(orig) ? Character.toUpperCase(encrypted) : Character.toLowerCase(encrypted);   // Возвращаем зашифрованный символ в оригинальном регистре
     }
 
-    private static int cryptValue(char[] charLine) { //метод для определени сдвига путём нахождения пробела
+    private static int cryptValue(ArrayList<Character> charList) { //метод для определения сдвига путём нахождения пробела
         HashMap<Character, Integer> candidates = new HashMap<>(); //мапа для кандидатов на роль пробела
         int counterInt = 0; //счётчик входа возможного пробела
-        char candidate = ' '; //возможный кандидат на роль пробела
-        for (int i = 2; i < charLine.length; i++) {
-            if (Character.isUpperCase(charLine[i]) && ALPHABET.contains(Character.toLowerCase(charLine[i])) && !candidates.containsKey(charLine[i-1])) { //ищем букву в верхнем регистре, проверяем, что она есть в алфавите шифра и проверяем на отсутствие в мапе
-                candidate = charLine[i - 1]; //на роль кандидата идёт символ стоящий перед символом из проверки
+        for (int i = 2; i < charList.size(); i++) {
+            char candidate = ' '; //возможный кандидат на роль пробела
+            if (Character.isUpperCase(charList.get(i)) && ALPHABET.contains(Character.toLowerCase(charList.get(i - 1))) && !candidates.containsKey(charList.get(i-1))) { //ищем букву в верхнем регистре, проверяем, что она есть в алфавите шифра и проверяем на отсутствие в мапе
+                candidate = charList.get(i - 1); //на роль кандидата идёт символ стоящий перед символом из проверки
+                for (int j = i; j < charList.size(); j++) {
+                    if (candidate == charList.get(j)) //ищем все вхождения этого символа
+                        counterInt++;
+                }
+                candidates.put(candidate, counterInt); //добавляем в мапу "кандидата" и количество входов
             }
-            for (int j = i; j < charLine.length; j++) {
-                if (candidate == charLine[j]) //ищем все вхождения этого символа
-                    counterInt++;
-            }
-            candidates.put(candidate, counterInt); //добавляем в мапу "кандидата" и количество входов
         }
         Character maxKey = null;
         for (char key : candidates.keySet()) {
