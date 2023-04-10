@@ -64,7 +64,7 @@ public class Caesar {
 
     private static String outputFilePath(String oldPath) { //Создание пути для нового файла
         int dotIndex = oldPath.lastIndexOf(".");
-        return oldPath.substring(0, dotIndex) + "Changed" + oldPath.substring(dotIndex);
+        return oldPath.substring(0, dotIndex) + "Encrypted" + oldPath.substring(dotIndex);
     }
 
     private static void encryptionDecryption(int idMethod, String filePath) throws NoSuchElementException { //работа с файлами
@@ -87,6 +87,7 @@ public class Caesar {
                         charList.add((char) character);
                     }
                     int shift = bruteForce(charList);
+                    System.out.println("The key is: " + shift);
                     for (int i = 0; i < charList.size(); i++) {
                         char origChar = charList.get(i);
                         char encryptedChar = encrypt(origChar, shift);
