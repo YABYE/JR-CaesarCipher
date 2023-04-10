@@ -153,7 +153,6 @@ public class Caesar {
             if (counter != 0)
                 shiftCandidates.put(i, counter); //добавляем случай в мапу
         }
-        System.out.println(shiftCandidates);
         int shift = 0;
         int maxValue = Collections.max(shiftCandidates.values()); //максимальное значение входов
         for (Map.Entry<Integer, Integer> entry : shiftCandidates.entrySet()) {
