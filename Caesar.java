@@ -155,15 +155,10 @@ public class Caesar {
                     counter--; //отнимаем значение из счётчика
             }
             if (counter != 0)
-                shiftCandidates.put(i, counter); //добавляем случай в мапу
+                shiftCandidates.put(counter, i); //добавляем случай в мапу
         }
-        int shift = 0;
-        int maxValue = Collections.max(shiftCandidates.values()); //максимальное значение входов
-        for (Map.Entry<Integer, Integer> entry : shiftCandidates.entrySet()) {
-            if (entry.getValue() == maxValue)
-                shift = entry.getKey(); //устанавливаем сдвиг
-        }
-        return shift;
+        int maxValue = Collections.max(shiftCandidates.keySet()); //максимальное значение входов
+        return shiftCandidates.get(maxValue);
     }
 }
 
