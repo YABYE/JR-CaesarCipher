@@ -2,23 +2,21 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-
 import static java.lang.Math.abs;
 
+
 public class Caesar {
+    private static Scanner scanner = new Scanner(System.in);
     private static final ArrayList<Character> ALPHABET = new ArrayList<>( //"алфавит" шифра
             List.of(
                     'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н',
                     'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь',
-                    'э', 'ю', 'я', '.', ',', '\"', ':', '-', '!', '?', ' ' // size = 41
+                    'э', 'ю', 'я', '.', ',', '"', ':', '-', '!', '?', ' ' // size = 41
             ));
     private static final ArrayList<Character> MARKS = new ArrayList<>(
             List.of(
                     '.', ',', ':', '-', '!', '?'
             ));
-
-    private static Scanner scanner = new Scanner(System.in);
-
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Caesar cipher broker");
@@ -125,7 +123,7 @@ public class Caesar {
             } else if (abs(shift) > ALPHABET.size() - 1) {
                 System.out.println("You entered a number that bigger than size of Alphabet. Try again:");
             }
-        } while (shift == 0 || (abs(shift) > ALPHABET.size() - 1));
+        } while (shift == 0 || (abs(shift) > ALPHABET.size() - 1)); //повторение пока сдвиг не подходит под условие
         return shift;
     }
 
