@@ -12,6 +12,10 @@ public class Caesar {
                     'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь',
                     'э', 'ю', 'я', '.', ',', '\"', ':', '-', '!', '?', ' ' // size = 41
             ));
+    private static final ArrayList<Character> MARKS = new ArrayList<>(
+            List.of(
+                    '.', ',', ':', '-', '!', '?'
+            ));
 
     private static Scanner scanner = new Scanner(System.in);
 
@@ -79,11 +83,22 @@ public class Caesar {
                     while (((character = reader.read()) != -1)) {
                         charList.add((char) character);
                     }
-                    int shift = cryptValue(charList);
-                    for (char characterList : charList) {
-                        char encryptedChar = encrypt(characterList, shift);
+                    int shift = bruteForce(charList);
+                    for (int i = 0; i < charList.size(); i++) {
+                        char origChar = charList.get(i);
+                        char encryptedChar = encrypt(origChar, shift);
+                        charList.set(i, encryptedChar);
+
+                        if (i == 0)
+                            encryptedChar = Character.toUpperCase(encryptedChar); //устанавливаем верхний регистр для первой буквы в тексте
+                        else if (i > 1 && charList.get(i - 1).equals('\n')) //устанавливаем верхний регистр для буквы после переноса строки
+                            encryptedChar = Character.toUpperCase(encryptedChar);
+                        else if (i > 2 && (charList.get(i - 2).equals('.') || charList.get(i - 2).equals('!') || charList.get(i - 2).equals('?'))) //устанавливаем верхний регистр для буквы после точки
+                            encryptedChar = Character.toUpperCase(encryptedChar);
+
                         writer.write(encryptedChar);
                     }
+
                 }
             }
         } catch (IOException e) {
@@ -121,27 +136,31 @@ public class Caesar {
         return Character.isUpperCase(orig) ? Character.toUpperCase(encrypted) : Character.toLowerCase(encrypted);   // Возвращаем зашифрованный символ в оригинальном регистре
     }
 
-    private static int cryptValue(ArrayList<Character> charList) { //метод для определения сдвига путём нахождения пробела
-        HashMap<Character, Integer> candidates = new HashMap<>(); //мапа для кандидатов на роль пробела
-        int counterInt = 0; //счётчик входа возможного пробела
-        for (int i = 2; i < charList.size(); i++) {
-            char candidate = ' '; //возможный кандидат на роль пробела
-            if (Character.isUpperCase(charList.get(i)) && ALPHABET.contains(Character.toLowerCase(charList.get(i - 1))) && !candidates.containsKey(charList.get(i-1))) { //ищем букву в верхнем регистре, проверяем, что она есть в алфавите шифра и проверяем на отсутствие в мапе
-                candidate = charList.get(i - 1); //на роль кандидата идёт символ стоящий перед символом из проверки
-                for (int j = i; j < charList.size(); j++) {
-                    if (candidate == charList.get(j)) //ищем все вхождения этого символа
-                        counterInt++;
-                }
-                candidates.put(candidate, counterInt); //добавляем в мапу "кандидата" и количество входов
+    private static int bruteForce (ArrayList<Character> charList) { //режим брутфорса
+        HashMap<Integer, Integer> shiftCandidates = new HashMap<>(); // мапа в которой будет хранится возможный сдвиг и количество его входов
+        for (int i = 0; i < ALPHABET.size(); i++) { //проверка при каждом сдвиге
+            ArrayList<Character> encList = new ArrayList<>();
+            for (char orig: charList) {
+                encList.add(encrypt(orig, i)); //изменение текста при проверяемом сдвиге
             }
-        }
-        Character maxKey = null;
-        for (char key : candidates.keySet()) {
-            if (maxKey == null || candidates.get(key) > candidates.get(maxKey)) {
-                maxKey = key; //получаем из мапы символ с максимальным количеством вхождений
+            int counter = 0; //счётчик для количества совпадений
+            for (int j = 0; j < encList.size() - 1; j++) { //размер текста
+                if (MARKS.contains(encList.get(j)) && (encList.get(j + 1).equals(' ') || encList.get(j + 1).equals('\n'))) //проверка на наличие пробела или переноса строки после знака препинания
+                    counter++; //прибавляем случай в счётчик
+                if (MARKS.contains(encList.get(j)) && (ALPHABET.indexOf(encList.get(j + 1)) <= 32)) //если после знака препинания, идёт буква, но не должна
+                    counter--; //отнимаем значение из счётчика
             }
+            if (counter != 0)
+                shiftCandidates.put(i, counter); //добавляем случай в мапу
         }
-        return ALPHABET.indexOf(' ') - ALPHABET.indexOf(maxKey); //получение сдвига
+        System.out.println(shiftCandidates);
+        int shift = 0;
+        int maxValue = Collections.max(shiftCandidates.values()); //максимальное значение входов
+        for (Map.Entry<Integer, Integer> entry : shiftCandidates.entrySet()) {
+            if (entry.getValue() == maxValue)
+                shift = entry.getKey(); //устанавливаем сдвиг
+        }
+        return shift;
     }
 }
 
