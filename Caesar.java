@@ -22,9 +22,13 @@ public class Caesar {
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Caesar cipher broker");
-        int idMethod = methodChoosing(scanner); //Выбор режима программы
-        String inputFilePath = fileName(scanner); //получение пути до файла
-        encryptionDecryption(idMethod, inputFilePath);
+        try {
+            int idMethod = methodChoosing(scanner); //Выбор режима программы
+            String inputFilePath = fileName(scanner); //получение пути до файла
+            encryptionDecryption(idMethod, inputFilePath);
+        } catch (NoSuchElementException e) {
+            System.out.println("The file might be empty");
+        }
         scanner.close();
     }
 
@@ -64,7 +68,7 @@ public class Caesar {
         return oldPath.substring(0, dotIndex) + "Changed" + oldPath.substring(dotIndex);
     }
 
-    private static void encryptionDecryption(int idMethod, String filePath) { //работа с файлами
+    private static void encryptionDecryption(int idMethod, String filePath) throws NoSuchElementException { //работа с файлами
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath(filePath)))) {
             switch (idMethod) {
